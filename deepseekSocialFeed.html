@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SocialFeed - Share Your Moments</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            color: #333;
+            line-height: 1.6;
+            padding-bottom: 100px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7, #182848);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: #ff6b6b;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn:hover, .nav-btn.active {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .search-filter {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .search-bar {
+            flex: 1;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+        
+        .filter-select {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        
+        .feed {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            margin-bottom: 100px;
+        }
+        
+        .post {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4b6cb7, #182848);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+        
+        .post-info {
+            flex: 1;
+        }
+        
+        .post-author {
+            font-weight: 600;
+            font-size: 17px;
+        }
+        
+        .post-time {
+            font-size: 13px;
+            color: #777;
+        }
+        
+        .post-content {
+            padding: 20px;
+        }
+        
+        .post-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+            line-height: 1.7;
+        }
+        
+        .post-media {
+            margin: 15px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            max-height: 400px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .post-media img, .post-media video {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+            object-fit: contain;
+        }
+        
+        .audio-player {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+            border-top: 1px solid #eee;
+        }
+        
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: none;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #555;
+        }
+        
+        .action-btn:hover {
+            background: #f0f5ff;
+        }
+        
+        .action-btn.liked {
+            color: #ff6b6b;
+        }
+        
+        .action-btn.disliked {
+            color: #4b6cb7;
+        }
+        
+        .action-btn.favorited {
+            color: #ffc107;
+        }
+        
+        .add-post-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            font-size: 30px;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .add-post-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 7px 25px rgba(255, 107, 107, 0.6);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modalOpen 0.4s ease-out;
+        }
+        
+        @keyframes modalOpen {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            background: linear-gradient(90deg, #4b6cb7, #182848);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #4b6cb7;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(75, 108, 183, 0.2);
+        }
+        
+        .media-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .media-option {
+            flex: 1;
+            padding: 12px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .media-option:hover {
+            border-color: #4b6cb7;
+            background: #f0f5ff;
+        }
+        
+        .media-option i {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #4b6cb7;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(45deg, #4b6cb7, #182848);
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #777;
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #ddd;
+        }
+        
+        .swear-warning {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        .media-preview {
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        
+        .media-preview img, .media-preview video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 8px;
+        }
+        
+        .remove-media {
+            margin-top: 10px;
+            color: #ff6b6b;
+            cursor: pointer;
+            display: inline-block;
+        }
+        
+        @media (max-width: 600px) {
+            .top-bar {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .search-filter {
+                width: 100%;
+            }
+            
+            .post-actions {
+                justify-content: space-between;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="top-bar">
+                <div class="logo">
+                    <i class="fas fa-users"></i>
+                    <span>SocialFeed</span>
+                </div>
+                <div class="nav-buttons">
+                    <button class="nav-btn active" id="home-btn">Home</button>
+                    <button class="nav-btn" id="favorites-btn">Favorites</button>
+                </div>
+            </div>
+            
+            <div class="search-filter">
+                <div class="search-bar">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search-input" placeholder="Search for posts...">
+                </div>
+                <select class="filter-select" id="filter-select">
+                    <option value="recent">Most Recent</option>
+                    <option value="liked">Most Liked</option>
+                    <option value="favorited">Most Favorited</option>
+                    <option value="disliked">Most Disliked</option>
+                </select>
+            </div>
+        </header>
+        
+        <div class="feed" id="post-feed">
+            <!-- Posts will be dynamically added here -->
+        </div>
+        
+        <button class="add-post-btn" id="add-post-btn">
+            <i class="fas fa-plus"></i>
+        </button>
+    </div>
+    
+    <!-- Create Post Modal -->
+    <div class="modal" id="create-post-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Post</h2>
+                <button class="close-btn" id="close-modal-btn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="post-name">Post Name</label>
+                    <input type="text" id="post-name" class="form-control" placeholder="Enter post name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="creator-name">Your Name</label>
+                    <input type="text" id="creator-name" class="form-control" placeholder="Enter your name">
+                    <div class="swear-warning" id="swear-warning">
+                        Inappropriate words have been removed from your name
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-content">Message</label>
+                    <textarea id="post-content" class="form-control" placeholder="What's on your mind?" rows="4"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Add Media (Optional)</label>
+                    <div class="media-options">
+                        <div class="media-option" id="add-image">
+                            <i class="fas fa-image"></i>
+                            <div>Image</div>
+                        </div>
+                        <div class="media-option" id="add-video">
+                            <i class="fas fa-video"></i>
+                            <div>Video</div>
+                        </div>
+                        <div class="media-option" id="add-audio">
+                            <i class="fas fa-music"></i>
+                            <div>Audio</div>
+                        </div>
+                    </div>
+                    
+                    <div class="media-preview" id="media-preview">
+                        <div id="media-content"></div>
+                        <div class="remove-media" id="remove-media">
+                            <i class="fas fa-trash"></i> Remove Media
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="media-file" style="display: none;" accept="image/*,video/*,audio/*">
+                </div>
+                
+                <button class="submit-btn" id="submit-post">Post</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample initial posts
+        const initialPosts = [
+            {
+                id: 1,
+                name: "Beach Vacation",
+                author: "Sarah Johnson",
+                content: "Just arrived at this beautiful beach! The water is crystal clear and the sand is so soft. Perfect weather for a vacation!",
+                time: "2 hours ago",
+                likes: 24,
+                dislikes: 2,
+                favorites: 8,
+                media: {
+                    type: "image",
+                    src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600"
+                },
+                liked: false,
+                disliked: false,
+                favorited: false
+            },
+            {
+                id: 2,
+                name: "New Song Release",
+                author: "Mike Thompson",
+                content: "Check out my new song! It's been a year in the making and I'm so excited to finally share it with everyone.",
+                time: "5 hours ago",
+                likes: 42,
+                dislikes: 5,
+                favorites: 22,
+                media: {
+                    type: "audio",
+                    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
+                },
+                liked: true,
+                disliked: false,
+                favorited: true
+            },
+            {
+                id: 3,
+                name: "Mountain Hike",
+                author: "Alex Rivera",
+                content: "Conquered the summit today! The view from up here is absolutely breathtaking. Worth every step of the challenging hike.",
+                time: "1 day ago",
+                likes: 56,
+                dislikes: 1,
+                favorites: 15,
+                media: {
+                    type: "video",
+                    src: "https://player.vimeo.com/video/76979871?h=8272103f6e"
+                },
+                liked: false,
+                disliked: false,
+                favorited: false
+            }
+        ];
+        
+        let posts = JSON.parse(localStorage.getItem('posts')) || initialPosts;
+        let currentMedia = null;
+        let currentView = 'home';
+        
+        // DOM Elements
+        const postFeed = document.getElementById('post-feed');
+        const addPostBtn = document.getElementById('add-post-btn');
+        const createPostModal = document.getElementById('create-post-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const submitPostBtn = document.getElementById('submit-post');
+        const homeBtn = document.getElementById('home-btn');
+        const favoritesBtn = document.getElementById('favorites-btn');
+        const searchInput = document.getElementById('search-input');
+        const filterSelect = document.getElementById('filter-select');
+        const creatorNameInput = document.getElementById('creator-name');
+        const swearWarning = document.getElementById('swear-warning');
+        const mediaFileInput = document.getElementById('media-file');
+        const addImageBtn = document.getElementById('add-image');
+        const addVideoBtn = document.getElementById('add-video');
+        const addAudioBtn = document.getElementById('add-audio');
+        const mediaPreview = document.getElementById('media-preview');
+        const mediaContent = document.getElementById('media-content');
+        const removeMediaBtn = document.getElementById('remove-media');
+        
+        // Swear words to filter
+        const swearWords = ['idiot', 'stupid', 'dumb', 'fool', 'moron', 'jerk'];
+        
+        // Initialize the app
+        function initApp() {
+            renderPosts(posts);
+            setupEventListeners();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            addPostBtn.addEventListener('click', () => {
+                createPostModal.style.display = 'flex';
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                createPostModal.style.display = 'none';
+            });
+            
+            submitPostBtn.addEventListener('click', createPost);
+            
+            homeBtn.addEventListener('click', () => {
+                currentView = 'home';
+                updateActiveButton();
+                renderPosts(posts);
+            });
+            
+            favoritesBtn.addEventListener('click', () => {
+                currentView = 'favorites';
+                updateActiveButton();
+                const favPosts = posts.filter(post => post.favorited);
+                renderPosts(favPosts);
+            });
+            
+            searchInput.addEventListener('input', filterPosts);
+            filterSelect.addEventListener('change', filterPosts);
+            
+            creatorNameInput.addEventListener('blur', filterSwearWords);
+            
+            // Media selection
+            addImageBtn.addEventListener('click', () => {
+                mediaFileInput.setAttribute('accept', 'image/*');
+                mediaFileInput.click();
+            });
+            
+            addVideoBtn.addEventListener('click', () => {
+                mediaFileInput.setAttribute('accept', 'video/*');
+                mediaFileInput.click();
+            });
+            
+            addAudioBtn.addEventListener('click', () => {
+                mediaFileInput.setAttribute('accept', 'audio/*');
+                mediaFileInput.click();
+            });
+            
+            mediaFileInput.addEventListener('change', handleMediaUpload);
+            
+            removeMediaBtn.addEventListener('click', () => {
+                currentMedia = null;
+                mediaPreview.style.display = 'none';
+            });
+        }
+        
+        // Filter swear words from creator name
+        function filterSwearWords() {
+            let name = creatorNameInput.value;
+            let originalName = name;
+            
+            swearWords.forEach(word => {
+                const regex = new RegExp(word, 'gi');
+                name = name.replace(regex, '***');
+            });
+            
+            if (name !== originalName) {
+                creatorNameInput.value = name;
+                swearWarning.style.display = 'block';
+            } else {
+                swearWarning.style.display = 'none';
+            }
+        }
+        
+        // Handle media upload
+        function handleMediaUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(event) {
+                currentMedia = {
+                    type: file.type.split('/')[0],
+                    src: event.target.result
+                };
+                
+                // Display preview
+                mediaContent.innerHTML = '';
+                
+                if (currentMedia.type === 'image') {
+                    mediaContent.innerHTML = `<img src="${currentMedia.src}" alt="Preview">`;
+                } else if (currentMedia.type === 'video') {
+                    mediaContent.innerHTML = `
+                        <video controls>
+                            <source src="${currentMedia.src}" type="${file.type}">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                } else if (currentMedia.type === 'audio') {
+                    mediaContent.innerHTML = `
+                        <audio controls class="audio-player">
+                            <source src="${currentMedia.src}" type="${file.type}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    `;
+                }
+                
+                mediaPreview.style.display = 'block';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+        
+        // Create new post
+        function createPost() {
+            const name = document.getElementById('post-name').value.trim();
+            const author = document.getElementById('creator-name').value.trim();
+            const content = document.getElementById('post-content').value.trim();
+            
+            if (!name || !author || !content) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            const newPost = {
+                id: Date.now(),
+                name,
+                author,
+                content,
+                time: 'Just now',
+                likes: 0,
+                dislikes: 0,
+                favorites: 0,
+                media: currentMedia,
+                liked: false,
+                disliked: false,
+                favorited: false
+            };
+            
+            posts.unshift(newPost);
+            localStorage.setItem('posts', JSON.stringify(posts));
+            
+            if (currentView === 'home') {
+                renderPosts(posts);
+            }
+            
+            createPostModal.style.display = 'none';
+            
+            // Reset form
+            document.getElementById('post-name').value = '';
+            document.getElementById('creator-name').value = '';
+            document.getElementById('post-content').value = '';
+            currentMedia = null;
+            mediaPreview.style.display = 'none';
+        }
+        
+        // Update active nav button
+        function updateActiveButton() {
+            homeBtn.classList.toggle('active', currentView === 'home');
+            favoritesBtn.classList.toggle('active', currentView === 'favorites');
+        }
+        
+        // Filter and sort posts
+        function filterPosts() {
+            let filteredPosts = [...posts];
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterValue = filterSelect.value;
+            
+            // Apply search
+            if (searchTerm) {
+                filteredPosts = filteredPosts.filter(post => 
+                    post.name.toLowerCase().includes(searchTerm) || 
+                    post.author.toLowerCase().includes(searchTerm) ||
+                    post.content.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Apply sorting
+            switch(filterValue) {
+                case 'recent':
+                    // Already sorted by recent by default
+                    break;
+                case 'liked':
+                    filteredPosts.sort((a, b) => b.likes - a.likes);
+                    break;
+                case 'favorited':
+                    filteredPosts.sort((a, b) => b.favorites - a.favorites);
+                    break;
+                case 'disliked':
+                    filteredPosts.sort((a, b) => b.dislikes - a.dislikes);
+                    break;
+            }
+            
+            renderPosts(filteredPosts);
+        }
+        
+        // Render posts to the feed
+        function renderPosts(postsToRender) {
+            if (postsToRender.length === 0) {
+                postFeed.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h3>No posts to show</h3>
+                        <p>Be the first to create a post!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            postFeed.innerHTML = '';
+            
+            postsToRender.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="avatar">${post.author.charAt(0)}</div>
+                        <div class="post-info">
+                            <div class="post-author">${post.author}</div>
+                            <div class="post-time">${post.time}</div>
+                        </div>
+                    </div>
+                    <div class="post-content">
+                        <h3>${post.name}</h3>
+                        <p class="post-text">${post.content}</p>
+                        ${post.media ? `
+                            <div class="post-media">
+                                ${post.media.type === 'image' ? 
+                                    `<img src="${post.media.src}" alt="Post image">` : 
+                                 post.media.type === 'video' ? 
+                                    `<video controls><source src="${post.media.src}" type="video/mp4">Your browser doesn't support videos</video>` : 
+                                    `<audio controls class="audio-player"><source src="${post.media.src}" type="audio/mpeg">Your browser doesn't support audio</audio>`}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="post-actions">
+                        <button class="action-btn like-btn ${post.liked ? 'liked' : ''}" data-id="${post.id}">
+                            <i class="fas fa-thumbs-up"></i> <span class="like-count">${post.likes}</span>
+                        </button>
+                        <button class="action-btn dislike-btn ${post.disliked ? 'disliked' : ''}" data-id="${post.id}">
+                            <i class="fas fa-thumbs-down"></i> <span class="dislike-count">${post.dislikes}</span>
+                        </button>
+                        <button class="action-btn favorite-btn ${post.favorited ? 'favorited' : ''}" data-id="${post.id}">
+                            <i class="fas fa-heart"></i> <span class="favorite-count">${post.favorites}</span>
+                        </button>
+                    </div>
+                `;
+                
+                postFeed.appendChild(postElement);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleLike(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.dislike-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleDislike(btn.dataset.id));
+            });
+            
+            document.querySelectorAll('.favorite-btn').forEach(btn => {
+                btn.addEventListener('click', () => handleFavorite(btn.dataset.id));
+            });
+        }
+        
+        // Handle like action
+        function handleLike(postId) {
+            const post = posts.find(p => p.id == postId);
+            if (!post) return;
+            
+            if (post.liked) {
+                post.likes--;
+                post.liked = false;
+            } else {
+                post.likes++;
+                post.liked = true;
+                
+                // If previously disliked, remove dislike
+                if (post.disliked) {
+                    post.dislikes--;
+                    post.disliked = false;
+                }
+            }
+            
+            localStorage.setItem('posts', JSON.stringify(posts));
+            renderPosts(currentView === 'home' ? posts : posts.filter(p => p.favorited));
+        }
+        
+        // Handle dislike action
+        function handleDislike(postId) {
+            const post = posts.find(p => p.id == postId);
+            if (!post) return;
+            
+            if (post.disliked) {
+                post.dislikes--;
+                post.disliked = false;
+            } else {
+                post.dislikes++;
+                post.disliked = true;
+                
+                // If previously liked, remove like
+                if (post.liked) {
+                    post.likes--;
+                    post.liked = false;
+                }
+            }
+            
+            localStorage.setItem('posts', JSON.stringify(posts));
+            renderPosts(currentView === 'home' ? posts : posts.filter(p => p.favorited));
+        }
+        
+        // Handle favorite action
+        function handleFavorite(postId) {
+            const post = posts.find(p => p.id == postId);
+            if (!post) return;
+            
+            if (post.favorited) {
+                post.favorites--;
+                post.favorited = false;
+            } else {
+                post.favorites++;
+                post.favorited = true;
+            }
+            
+            localStorage.setItem('posts', JSON.stringify(posts));
+            renderPosts(currentView === 'home' ? posts : posts.filter(p => p.favorited));
+        }
+        
+        // Initialize the app when the page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
